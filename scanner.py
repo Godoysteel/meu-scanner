@@ -21,20 +21,17 @@ st.markdown("""
 [data-testid="collapsedControl"] { display: none !important; }
 section.main { background-color: #0D0A00 !important; }
 #MainMenu, footer, header { visibility: hidden; }
-.block-container { padding-top: 1.2rem !important; max-width: 900px !important; }
+.block-container { padding-top: 1.2rem !important; max-width: 900px !important; padding-left: 12px !important; padding-right: 12px !important; }
 
-/* expander estilo escuro */
-[data-testid="stExpander"] {
-    background: #150F00 !important;
-    border: 1px solid #3A2E00 !important;
-    border-radius: 10px !important;
-    margin-bottom: 16px !important;
-}
-[data-testid="stExpander"] summary { color: #C88600 !important; font-family: monospace !important; font-size: 0.8rem !important; }
+/* expander */
+[data-testid="stExpander"] { background: #150F00 !important; border: 1px solid #3A2E00 !important; border-radius: 10px !important; margin-bottom: 16px !important; }
+[data-testid="stExpander"] summary { color: #F5A800 !important; font-family: monospace !important; font-size: 1rem !important; font-weight: bold !important; }
+[data-testid="stExpander"] label { color: #F0D080 !important; font-size: 1rem !important; }
+[data-testid="stExpander"] p { color: #F0D080 !important; }
 
 /* tabs */
 .stTabs [data-baseweb="tab-list"] { background: #150F00; border-radius: 8px; padding: 4px; gap: 4px; }
-.stTabs [data-baseweb="tab"] { background: transparent; color: #8A7040 !important; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 1px; }
+.stTabs [data-baseweb="tab"] { background: transparent; color: #C8A050 !important; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.9rem; letter-spacing: 1px; }
 .stTabs [aria-selected="true"] { background: #2A1F00 !important; color: #F5A800 !important; border-bottom: 2px solid #F5A800 !important; }
 
 /* título */
@@ -46,16 +43,15 @@ section.main { background-color: #0D0A00 !important; }
     text-align: center;
     border-bottom: 1px solid #3A2E00;
     padding-bottom: 14px;
-    margin-bottom: 22px;
+    margin-bottom: 8px;
 }
 .gd-subtitle {
     font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    color: #5A4500;
+    font-size: 0.75rem;
+    color: #C88600;
     text-align: center;
-    letter-spacing: 3px;
-    margin-top: -18px;
-    margin-bottom: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 18px;
     text-transform: uppercase;
 }
 
@@ -63,10 +59,10 @@ section.main { background-color: #0D0A00 !important; }
 .card {
     background: #1A1400;
     border: 1px solid #3A2E00;
-    border-left: 4px solid #F5A800;
+    border-left: 5px solid #F5A800;
     border-radius: 10px;
     padding: 0;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     overflow: hidden;
 }
 .card-top {
@@ -74,85 +70,124 @@ section.main { background-color: #0D0A00 !important; }
     align-items: center;
     justify-content: space-between;
     background: #110D00;
-    padding: 8px 16px;
+    padding: 10px 14px;
     border-bottom: 1px solid #2A2000;
+    flex-wrap: wrap;
+    gap: 4px;
 }
 .card-liga {
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    color: #C88600;
-    letter-spacing: 1.5px;
+    font-size: 0.78rem;
+    color: #F0C060;
+    letter-spacing: 1px;
     text-transform: uppercase;
+    font-weight: 500;
 }
 .card-tempo {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #F5A800;
     background: #2A1F00;
     border: 1px solid #5A4000;
     border-radius: 5px;
-    padding: 1px 10px;
+    padding: 2px 12px;
+    white-space: nowrap;
 }
+
+/* placar — layout em coluna no mobile */
 .card-placar {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    gap: 12px;
+    padding: 14px 14px 10px;
+    gap: 4px;
 }
 .time-h {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.35rem;
-    color: #FFF8E0;
+    font-size: 1.5rem;
+    color: #FFFFFF;
     letter-spacing: 1px;
-    flex: 1;
+    text-align: center;
+    width: 100%;
+    line-height: 1.1;
 }
 .time-a {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.35rem;
-    color: #FFF8E0;
+    font-size: 1.5rem;
+    color: #FFFFFF;
     letter-spacing: 1px;
-    flex: 1;
-    text-align: right;
+    text-align: center;
+    width: 100%;
+    line-height: 1.1;
 }
 .placar-vs {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.8rem;
+    font-size: 2rem;
     color: #F5A800;
-    letter-spacing: 6px;
+    letter-spacing: 8px;
+    text-align: center;
 }
 
-/* stat boxes */
+/* stats — 2 colunas no mobile */
 .stat-wrap {
     background: #130F00;
     border-top: 1px solid #2A2000;
-    padding: 10px 16px 12px;
+    padding: 12px 14px 14px;
 }
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.stat-box { text-align: center; }
 .stat-label {
-    color: #6A5520;
+    color: #C8A050;
     font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1px;
     text-align: center;
     margin-bottom: 4px;
+    display: block;
 }
 .stat-value {
-    color: #FFF8E0;
+    color: #FFFFFF;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     text-align: center;
     line-height: 1;
+    display: block;
 }
 .stat-value.destaque { color: #F5A800; }
 
-/* barra de progresso posse */
-.barra-wrap { margin-top: 2px; }
+/* barra de posse */
+.barra-label {
+    color: #C8A050;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    display: block;
+}
+.barra-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.barra-pct {
+    font-family: 'Bebas Neue', monospace;
+    font-size: 1rem;
+    color: #F5A800;
+    min-width: 38px;
+}
+.barra-pct.right { text-align: right; }
 .barra-bg {
     background: #2A2000;
     border-radius: 3px;
-    height: 5px;
-    width: 100%;
+    height: 7px;
+    flex: 1;
     overflow: hidden;
 }
 .barra-fill {
@@ -161,35 +196,36 @@ section.main { background-color: #0D0A00 !important; }
     background: linear-gradient(90deg, #F5A800, #C88600);
 }
 
-/* alerta sem jogos */
+/* sem jogos */
 .sem-jogos {
     text-align: center;
     padding: 60px 20px;
-    color: #5A4500;
+    color: #C8A050;
     font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     letter-spacing: 1px;
+    line-height: 2;
 }
 
-/* botão */
+/* botão registrar */
 .stButton > button {
-    background: #2A1F00 !important;
-    color: #F5A800 !important;
-    border: 1px solid #5A4000 !important;
+    background: #F5A800 !important;
+    color: #0D0A00 !important;
+    border: none !important;
     border-radius: 8px !important;
     font-family: 'DM Mono', monospace !important;
-    font-size: 0.75rem !important;
+    font-size: 0.9rem !important;
+    font-weight: bold !important;
     letter-spacing: 1px !important;
     width: 100% !important;
+    padding: 12px !important;
     transition: all 0.2s !important;
 }
-.stButton > button:hover {
-    background: #3A2F00 !important;
-    border-color: #F5A800 !important;
-}
+.stButton > button:hover { background: #C88600 !important; }
 
 /* dataframe */
 .stDataFrame { background: #1A1400 !important; }
+p, label, .stMarkdown { color: #F0D080 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -316,18 +352,25 @@ with tab_scanner:
             play_alert()
 
         # ── Contador ──────────────────────────────────────────────────────────
-        col_info1, col_info2 = st.columns([1, 1])
-        with col_info1:
-            st.markdown(f"**{len(jogos_ok)}** jogo(s) nos critérios")
-        with col_info2:
-            st.markdown(f"<div style='text-align:right;color:#5A4500;font-size:0.75rem;font-family:monospace'>Total ao vivo: {len(res_live)}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"""<div style='display:flex;justify-content:space-between;align-items:center;
+                margin-bottom:12px;font-family:monospace;'>
+                <span style='color:#F5A800;font-size:1rem;font-weight:bold'>
+                    ⚽ {len(jogos_ok)} jogo(s) encontrado(s)
+                </span>
+                <span style='color:#C8A050;font-size:0.8rem'>
+                    {len(res_live)} ao vivo
+                </span>
+            </div>""",
+            unsafe_allow_html=True
+        )
 
         if not jogos_ok:
             st.markdown("""
                 <div class="sem-jogos">
                     ⏳<br><br>
                     AGUARDANDO JOGOS NOS CRITÉRIOS<br>
-                    <span style="color:#3A2800">0×0 · MINUTO CONFIGURADO · SEM GOLS</span>
+                    0×0 · DENTRO DO INTERVALO · SEM GOLS
                 </div>
             """, unsafe_allow_html=True)
 
@@ -347,39 +390,39 @@ with tab_scanner:
                     <span class="card-tempo">⏱ {jogo['tempo']}'</span>
                 </div>
                 <div class="card-placar">
-                    <span class="time-h">{jogo['home']}</span>
-                    <span class="placar-vs">0 × 0</span>
-                    <span class="time-a">{jogo['away']}</span>
+                    <div class="time-h">{jogo['home']}</div>
+                    <div class="placar-vs">0 × 0</div>
+                    <div class="time-a">{jogo['away']}</div>
                 </div>
                 <div class="stat-wrap">
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-                        <div>
-                            <div class="stat-label">🥅 Chute Gol</div>
-                            <div class="stat-value destaque">{s['h_chg']} · {s['a_chg']}</div>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">🥅 CHUTE A GOL</span>
+                            <span class="stat-value destaque">{s['h_chg']} · {s['a_chg']}</span>
                         </div>
-                        <div>
-                            <div class="stat-label">🎯 Finalizações</div>
-                            <div class="stat-value">{s['h_cht']} · {s['a_cht']}</div>
+                        <div class="stat-box">
+                            <span class="stat-label">🎯 FINALIZAÇÕES</span>
+                            <span class="stat-value">{s['h_cht']} · {s['a_cht']}</span>
                         </div>
-                        <div>
-                            <div class="stat-label">🚩 Escanteios</div>
-                            <div class="stat-value">{s['h_esc']} · {s['a_esc']}</div>
+                        <div class="stat-box">
+                            <span class="stat-label">🚩 ESCANTEIOS</span>
+                            <span class="stat-value">{s['h_esc']} · {s['a_esc']}</span>
                         </div>
-                        <div>
-                            <div class="stat-label">⚽ Posse</div>
-                            <div class="stat-value">{s['h_po']}% · {s['a_po']}%</div>
+                        <div class="stat-box">
+                            <span class="stat-label">⚽ POSSE</span>
+                            <span class="stat-value">{s['h_po']}% · {s['a_po']}%</span>
                         </div>
                     </div>
-                    <div class="stat-label" style="margin-bottom:4px">POSSE DE BOLA</div>
-                    <div style="display:flex;align-items:center;gap:8px">
-                        <span style="font-family:'DM Mono',monospace;font-size:0.7rem;color:#C88600;min-width:32px">{s['h_po']}%</span>
-                        <div class="barra-bg" style="flex:1">
+                    <span class="barra-label">POSSE DE BOLA</span>
+                    <div class="barra-row">
+                        <span class="barra-pct">{s['h_po']}%</span>
+                        <div class="barra-bg">
                             <div class="barra-fill" style="width:{po_h_pct}%"></div>
                         </div>
-                        <div class="barra-bg" style="flex:1;transform:scaleX(-1)">
+                        <div class="barra-bg" style="transform:scaleX(-1)">
                             <div class="barra-fill" style="width:{po_a_pct}%"></div>
                         </div>
-                        <span style="font-family:'DM Mono',monospace;font-size:0.7rem;color:#C88600;min-width:32px;text-align:right">{s['a_po']}%</span>
+                        <span class="barra-pct right">{s['a_po']}%</span>
                     </div>
                 </div>
             </div>
