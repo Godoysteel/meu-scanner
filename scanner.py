@@ -17,11 +17,20 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;600&display=swap');
 
 [data-testid="stAppViewContainer"] { background-color: #0D0A00 !important; }
-[data-testid="stSidebar"] { background-color: #110D00 !important; border-right: 1px solid #3A2E00; }
-[data-testid="stSidebar"] * { color: #F0D080 !important; }
+[data-testid="stSidebar"] { display: none !important; }
+[data-testid="collapsedControl"] { display: none !important; }
 section.main { background-color: #0D0A00 !important; }
 #MainMenu, footer, header { visibility: hidden; }
 .block-container { padding-top: 1.2rem !important; max-width: 900px !important; }
+
+/* expander estilo escuro */
+[data-testid="stExpander"] {
+    background: #150F00 !important;
+    border: 1px solid #3A2E00 !important;
+    border-radius: 10px !important;
+    margin-bottom: 16px !important;
+}
+[data-testid="stExpander"] summary { color: #C88600 !important; font-family: monospace !important; font-size: 0.8rem !important; }
 
 /* tabs */
 .stTabs [data-baseweb="tab-list"] { background: #150F00; border-radius: 8px; padding: 4px; gap: 4px; }
@@ -188,18 +197,17 @@ section.main { background-color: #0D0A00 !important; }
 st.markdown('<div class="gd-title">⚽ GDSCANNER ELITE</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="gd-subtitle">AO VIVO · ATUALIZADO ÀS {datetime.now().strftime("%H:%M:%S")}</div>', unsafe_allow_html=True)
 
-# ── SIDEBAR ───────────────────────────────────────────────────────────────────
-st.sidebar.markdown("### ⚙️ Painel")
-som_ativo = st.sidebar.toggle("🔔 Alerta Sonoro", value=False)
-minuto_min = st.sidebar.slider("⏱ Minuto mínimo", 1, 15, 1)
-minuto_max = st.sidebar.slider("⏱ Minuto máximo", 15, 45, 28)
-st.sidebar.divider()
-st.sidebar.markdown("### 🎯 Filtros de Pressão")
-min_chutes  = st.sidebar.number_input("Mín. chutes a gol (total)", 0, 20, 0)
-min_cantos  = st.sidebar.number_input("Mín. escanteios (total)",   0, 20, 0)
-min_posse   = st.sidebar.number_input("Mín. posse dominante (%)",  0, 100, 0)
-st.sidebar.divider()
-st.sidebar.caption("🔄 Auto-refresh: 30s")
+# ── FILTROS (expander — funciona no mobile) ───────────────────────────────────
+with st.expander("⚙️ Filtros & Configurações", expanded=False):
+    col_f1, col_f2 = st.columns(2)
+    with col_f1:
+        som_ativo  = st.toggle("🔔 Alerta Sonoro", value=False)
+        minuto_min = st.slider("⏱ Minuto mínimo", 1, 15, 1)
+        minuto_max = st.slider("⏱ Minuto máximo", 15, 45, 28)
+    with col_f2:
+        min_chutes = st.number_input("🥅 Mín. chutes a gol", 0, 20, 0)
+        min_cantos = st.number_input("🚩 Mín. escanteios",   0, 20, 0)
+        min_posse  = st.number_input("⚽ Mín. posse (%)",    0, 100, 0)
 
 # ── API ───────────────────────────────────────────────────────────────────────
 API_KEY = "7cd42ac471d260d53b033d7ec69ef53a"
