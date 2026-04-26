@@ -1,21 +1,12 @@
 import streamlit as st
 import requests
 from streamlit_autorefresh import st_autorefresh
-import base64
 
+# 1. Configurações da Página
 st.set_page_config(page_title="PRO Scanner Elite", layout="wide")
-st_autorefresh(interval=30 * 1000, key="datarefresh")
 
-# --- FUNÇÃO PARA O SOM ---
-def play_alert():
-    # Som de "Ping/Notificação" curto e profissional
-    audio_url = "https://www.soundjay.com/buttons/sounds/button-3.mp3"
-    audio_html = f"""
-        <audio autoplay>
-            <source src="{audio_url}" type="audio/mp3">
-        </audio>
-    """
-    st.markdown(audio_html, unsafe_allow_html=True)
+# Atualiza sozinho a cada 30 segundos
+st_autorefresh(interval=30 * 1000, key="datarefresh")
 
 st.markdown("""
     <style>
@@ -28,6 +19,23 @@ st.markdown("""
     .stat-value { font-size: 18px; font-weight: bold; color: white; }
     </style>
     """, unsafe_allow_html=True)
+
+# --- CONFIGURAÇÃO DE ÁUDIO ---
+def play_alert():
+    # Som de "Bell/Notificação"
+    audio_url = "https://www.soundjay.com/buttons/sounds/button-3.mp3"
+    audio_html = f"""
+        <audio autoplay>
+            <source src="{audio_url}" type="audio/mp3">
+        </audio>
+    """
+    st.markdown(audio_html, unsafe_allow_html=True)
+
+# Sidebar para controles
+st.sidebar.title("Configurações")
+som_ativo = st.sidebar.toggle("🔔 Ativar Alerta Sonoro", value=False)
+if som_ativo:
+    st.sidebar.success("Alerta sonoro ativado para jogos VERDES!")
 
 API_KEY = "7cd42ac471d260d53b033d7ec69ef53a"
 HEADERS = {"x-apisports-key": API_KEY}
@@ -49,44 +57,47 @@ def get_stats(f_id):
             return d
     except: return None
 
-st.title("🛰️ Monitor Elite c/ Alerta Sonoro")
-st.warning("⚠️ IMPORTANTE: Clique em qualquer lugar da tela para ativar o som do alerta.")
+st.title("🛰️ Monitor Elite: 0x0 até 28'")
 
-res_live = requests.get("https://v3.football.api-sports.io/fixtures?live=all", headers=HEADERS).json().get("response", [])
-jogos_lista = []
-tem_alerta_verde = False
+try:
+    res_live = requests.get("https://v3.football.api-sports.io/fixtures?live=all", headers=HEADERS).json().get("response", [])
+    jogos_lista = []
+    alerta_disparado = False
 
-for j in res_live:
-    t = j["fixture"]["status"]["elapsed"]
-    gh, ga = (j["goals"]["home"] or 0), (j["goals"]["away"] or 0)
-    
-    if t is not None and 5 <= t <= 28 and gh == 0 and ga == 0:
-        stats = get_stats(j["fixture"]["id"])
-        if stats:
-            total_ch = stats['h_ch'] + stats['a_ch']
-            max_po = max(stats['h_po'], stats['a_po'])
-            total_esc = stats['h_esc'] + stats['a_esc']
+    for j in res_live:
+        t = j["fixture"]["status"]["elapsed"]
+        gh, ga = (j["goals"]["home"] or 0), (j["goals"]["away"] or 0)
+        
+        if t is not None and 5 <= t <= 28 and gh == 0 and ga == 0:
+            stats = get_stats(j["fixture"]["id"])
+            if stats:
+                total_ch = stats['h_ch'] + stats['a_ch']
+                max_po = max(stats['h_po'], stats['a_po'])
+                total_esc = stats['h_esc'] + stats['a_esc']
 
-            if (total_ch >= 3 and max_po >= 65) or total_esc >= 4:
-                p, cl, lb, co = 2, "card-verde", "🔥 PRESSÃO ALTA", "#10b981"
-                tem_alerta_verde = True # Ativa o sinal de som
-            elif total_ch >= 1 or max_po >= 55:
-                p, cl, lb, co = 1, "card-amarelo", "⚠️ FICANDO BOM", "#fbbf24"
-            else:
-                p, cl, lb, co = 0, "card-normal", "🔍 MONITORANDO", "#4b5563"
-            
-            jogos_lista.append({"p": p, "t": t, "h": j["teams"]["home"]["name"], "a": j["teams"]["away"]["name"], "s": stats, "cl": cl, "lb": lb, "co": co})
+                if (total_ch >= 3 and max_po >= 65) or total_esc >= 4:
+                    p, cl, lb, co = 2, "card-verde", "🔥 PRESSÃO ALTA", "#10b981"
+                    alerta_disparado = True
+                elif total_ch >= 1 or max_po >= 55:
+                    p, cl, lb, co = 1, "card-amarelo", "⚠️ FICANDO BOM", "#fbbf24"
+                else:
+                    p, cl, lb, co = 0, "card-normal", "🔍 MONITORANDO", "#4b5563"
+                
+                jogos_lista.append({"p": p, "t": t, "h": j["teams"]["home"]["name"], "a": j["teams"]["away"]["name"], "s": stats, "cl": cl, "lb": lb, "co": co})
 
-# Se houver algum jogo VERDE, toca o som!
-if tem_alerta_verde:
-    play_alert()
+    # Disparar som se estiver ativo e houver jogo verde
+    if alerta_disparado and som_ativo:
+        play_alert()
 
-jogos_lista.sort(key=lambda x: x['p'], reverse=True)
+    jogos_lista.sort(key=lambda x: x['p'], reverse=True)
 
-for jogo in jogos_lista:
-    st.markdown(f'<div class="{jogo["cl"]}"><span class="badge" style="background-color: {jogo["co"]}">{jogo["lb"]}</span><span style="color: #ffaa00; font-weight: bold;">⏱ {jogo["t"]}\'</span> <span style="font-size: 16px; margin-left: 10px; color: white;">{jogo["h"]} vs {jogo["a"]}</span></div>', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3)
-    with c1: st.markdown(f'<p class="stat-label">Chutes Totais</p><p class="stat-value">{jogo["s"]["h_ch"]} | {jogo["s"]["a_ch"]}</p>', unsafe_allow_html=True)
-    with c2: st.markdown(f'<p class="stat-label">Escanteios</p><p class="stat-value">{jogo["s"]["h_esc"]} | {jogo["s"]["a_esc"]}</p>', unsafe_allow_html=True)
-    with c3: st.markdown(f'<p class="stat-label">Posse de Bola</p><p class="stat-value">{jogo["s"]["h_po"]}% | {jogo["s"]["a_po"]}%</p>', unsafe_allow_html=True)
-    st.divider()
+    for jogo in jogos_lista:
+        st.markdown(f'<div class="{jogo["cl"]}"><span class="badge" style="background-color: {jogo["co"]}">{jogo["lb"]}</span><span style="color: #ffaa00; font-weight: bold;">⏱ {jogo["t"]}\'</span> <span style="color:white; margin-left:10px;">{jogo["h"]} vs {jogo["a"]}</span></div>', unsafe_allow_html=True)
+        c1, c2, c3 = st.columns(3)
+        with c1: st.markdown(f'<p class="stat-label">Chutes</p><p class="stat-value">{jogo["s"]["h_ch"]} | {jogo["s"]["a_ch"]}</p>', unsafe_allow_html=True)
+        with c2: st.markdown(f'<p class="stat-label">Cantos</p><p class="stat-value">{jogo["s"]["h_esc"]} | {jogo["s"]["a_esc"]}</p>', unsafe_allow_html=True)
+        with c3: st.markdown(f'<p class="stat-label">Posse</p><p class="stat-value">{jogo["s"]["h_po"]}% | {jogo["s"]["a_po"]}%</p>', unsafe_allow_html=True)
+        st.divider()
+
+except:
+    st.error("Aguardando próxima atualização dos dados...")
