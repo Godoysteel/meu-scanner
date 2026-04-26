@@ -1,32 +1,17 @@
 import streamlit as st
 import requests
-import pandas as pd
 
-# 1. Configurações de Estilo e Layout
-st.set_page_config(page_title="PRO Scanner - Brasilcana", layout="wide", initial_sidebar_state="collapsed")
+# 1. Configurações de Estilo
+st.set_page_config(page_title="PRO Scanner Elite", layout="wide")
 
-# CSS para interface profissional (Dark Mode e Cards)
 st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] { background-color: #0e1117; }
-    .main-card {
-        background-color: #1c1f26;
-        border-radius: 15px;
-        padding: 20px;
-        border-left: 5px solid #00ffcc;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    }
-    .time-badge {
-        background-color: #ffaa00;
-        color: black;
-        padding: 2px 8px;
-        border-radius: 5px;
-        font-weight: bold;
-        font-size: 14px;
-    }
-    .stat-label { color: #808495; font-size: 12px; text-transform: uppercase; }
-    .stat-value { font-size: 22px; font-weight: bold; color: #ffffff; }
+    .card-verde { background-color: #064e3b; border-left: 8px solid #10b981; border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+    .card-amarelo { background-color: #451a03; border-left: 8px solid #fbbf24; border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+    .card-normal { background-color: #1c1f26; border-left: 8px solid #4b5563; border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+    .badge { padding: 2px 10px; border-radius: 5px; font-weight: bold; color: black; margin-right: 10px; }
+    .stat-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 5px; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -38,66 +23,70 @@ def get_stats(f_id):
     try:
         res = requests.get(url, headers=HEADERS).json().get("response", [])
         if len(res) >= 2:
-            data = {}
-            for i, side in enumerate(['home', 'away']):
-                s_list = res[i]['statistics']
-                data[f'{side}_chutes'] = next((s['value'] for s in s_list if s['type'] == "Shots on Goal"), 0) or 0
-                data[f'{side}_posse'] = next((s['value'] for s in s_list if s['type'] == "Ball Possession"), "0%") or "0%"
-            return data
+            d = {}
+            for i, s in enumerate(['h', 'a']):
+                st_list = res[i]['statistics']
+                d[f'{s}_ch'] = next((x['value'] for x in st_list if x['type'] == "Shots on Goal"), 0) or 0
+                posse_str = next((x['value'] for x in st_list if x['type'] == "Ball Possession"), "0%") or "0%"
+                d[f'{s}_po'] = int(str(posse_str).replace('%',''))
+            return d
     except: return None
-    return None
 
-# Título e Header
-st.title("⚽ PRO Scanner: Estratégia Late 0x0")
-st.caption("Filtro Ativo: Empates em 0x0 | Tempo: 0' até 28' | Atualização em Tempo Real")
+st.title("🏆 PRO Scanner Elite: 0x0 Intelligence")
 
-if st.button('🔄 SCANNEAR MERCADO AGORA', use_container_width=True):
-    with st.spinner('Analisando ligas ao vivo...'):
-        url_live = "https://v3.football.api-sports.io/fixtures?live=all"
-        todos_jogos = requests.get(url_live, headers=HEADERS).json().get("response", [])
+if st.button('🔄 SCANNEAR AGORA', use_container_width=True):
+    with st.spinner('Analisando comportamento dos times...'):
+        res_live = requests.get("https://v3.football.api-sports.io/fixtures?live=all", headers=HEADERS).json().get("response", [])
         
-        encontrados = 0
-        
-        for j in todos_jogos:
-            tempo = j["fixture"]["status"]["elapsed"]
-            gh = j["goals"]["home"] or 0
-            ga = j["goals"]["away"] or 0
+        jogos_lista = []
+        for j in res_live:
+            t = j["fixture"]["status"]["elapsed"]
+            gh, ga = (j["goals"]["home"] or 0), (j["goals"]["away"] or 0)
             
-            if tempo is not None and tempo <= 28 and gh == 0 and ga == 0:
-                encontrados += 1
-                f_id = j["fixture"]["id"]
-                home = j["teams"]["home"]["name"]
-                away = j["teams"]["away"]["name"]
-                stats = get_stats(f_id)
-                
-                # Renderização do Card Profissional
-                st.markdown(f"""
-                    <div class="main-card">
-                        <span class="time-badge">⏱ {tempo}'</span>
-                        <span style="margin-left: 15px; font-size: 18px; font-weight: 500;">{home} vs {away}</span>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-                
+            if t is not None and t <= 28 and gh == 0 and ga == 0:
+                stats = get_stats(j["fixture"]["id"])
                 if stats:
-                    with col1:
-                        st.markdown(f'<p class="stat-label">Chutes {home}</p>', unsafe_allow_html=True)
-                        st.markdown(f'<p class="stat-value">{stats["home_chutes"]}</p>', unsafe_allow_html=True)
-                    with col2:
-                        st.markdown(f'<p class="stat-label">Posse {home}</p>', unsafe_allow_html=True)
-                        st.markdown(f'<p class="stat-value">{stats["home_posse"]}</p>', unsafe_allow_html=True)
-                    with col3:
-                        st.markdown(f'<p class="stat-label">Chutes {away}</p>', unsafe_allow_html=True)
-                        st.markdown(f'<p class="stat-value">{stats["away_chutes"]}</p>', unsafe_allow_html=True)
-                    with col4:
-                        st.markdown(f'<p class="stat-label">Posse {away}</p>', unsafe_allow_html=True)
-                        st.markdown(f'<p class="stat-value">{stats["away_posse"]}</p>', unsafe_allow_html=True)
-                
-                st.divider()
+                    # Lógica de Classificação
+                    total_chutes = stats['h_ch'] + stats['a_ch']
+                    max_posse = max(stats['h_po'], stats['a_po'])
+                    
+                    prioridade = 0 # 0=Cinza, 1=Amarelo, 2=Verde
+                    classe = "card-normal"
+                    label = "MONITORANDO"
+                    cor_badge = "#9ca3af"
 
-        if encontrados == 0:
-            st.warning("🔍 Nenhum jogo encontrado nos critérios de 0x0 até 28 minutos no momento.")
+                    if total_chutes >= 3 or max_posse >= 65:
+                        prioridade = 2
+                        classe = "card-verde"
+                        label = "🔥 ENTRADA CONFIRMADA"
+                        cor_badge = "#10b981"
+                    elif total_chutes >= 1 or max_posse >= 58:
+                        prioridade = 1
+                        classe = "card-amarelo"
+                        label = "⚠️ INTERESSANTE"
+                        cor_badge = "#fbbf24"
+                    
+                    jogos_lista.append({
+                        "prio": prioridade, "tempo": t, "home": j["teams"]["home"]["name"],
+                        "away": j["teams"]["away"]["name"], "stats": stats, "classe": classe, 
+                        "label": label, "cor": cor_badge
+                    })
 
-st.markdown("---")
-st.info("💡 Dica: Jogos com mais de 3 chutes a gol antes dos 25' indicam alta tendência de golo HT.")
+        # ORDENAR: Verdes primeiro, depois Amarelos
+        jogos_lista.sort(key=lambda x: x['prio'], reverse=True)
+
+        for jogo in jogos_lista:
+            st.markdown(f"""
+                <div class="{jogo['classe']}">
+                    <span class="badge" style="background-color: {jogo['cor']}">{jogo['label']}</span>
+                    <span style="color: #ffaa00; font-weight: bold;">⏱ {jogo['tempo']}'</span> 
+                    <span style="font-size: 18px; margin-left: 10px;">{jogo['home']} 0x0 {jogo['away']}</span>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            c1, c2, c3, c4 = st.columns(4)
+            with c1: st.metric(f"🎯 Chutes {jogo['home']}", jogo['stats']['h_ch'])
+            with c2: st.metric(f"⚽ Posse {jogo['home']}", f"{jogo['stats']['h_po']}%")
+            with c3: st.metric(f"🎯 Chutes {jogo['away']}", jogo['stats']['a_ch'])
+            with c4: st.metric(f"⚽ Posse {jogo['away']}", f"{jogo['stats']['a_po']}%")
+            st.divider()
